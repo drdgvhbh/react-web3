@@ -22,12 +22,11 @@ const childContextTypes = {
     accounts: PropTypes.array,
     selectedAccount: PropTypes.string,
     network: PropTypes.string,
-    networkId: PropTypes.number
+    networkId: PropTypes.any
   })
 };
 
 class Web3Provider extends React.Component {
-
   static contextTypes = {
     store: PropTypes.object
   };
@@ -102,13 +101,16 @@ class Web3Provider extends React.Component {
     const ethAccounts = this.getAccounts();
 
     if (isEmpty(ethAccounts)) {
-      web3 && web3.currentProvider && web3.currentProvider.enable()
-      .then(accounts => this.handleAccounts(accounts))
-      .catch((err) => {
-        this.setState({
-          accountsError: err
-        });
-      });
+      web3 &&
+        web3.currentProvider &&
+        web3.currentProvider
+          .enable()
+          .then(accounts => this.handleAccounts(accounts))
+          .catch(err => {
+            this.setState({
+              accountsError: err
+            });
+          });
     } else {
       this.handleAccounts(ethAccounts);
     }
@@ -121,7 +123,7 @@ class Web3Provider extends React.Component {
     let curr = this.state.accounts[0];
     next = next && next.toLowerCase();
     curr = curr && curr.toLowerCase();
-    const didChange = curr && next && (curr !== next);
+    const didChange = curr && next && curr !== next;
 
     if (isEmpty(this.state.accounts) && !isEmpty(accounts)) {
       this.setState({
@@ -151,7 +153,7 @@ class Web3Provider extends React.Component {
         store.dispatch({
           type: 'web3/LOGOUT',
           address: null
-        })
+        });
       } else if (didLogin || (isConstructor && next)) {
         store.dispatch({
           type: 'web3/RECEIVE_ACCOUNT',
@@ -161,7 +163,7 @@ class Web3Provider extends React.Component {
         store.dispatch({
           type: 'web3/CHANGE_ACCOUNT',
           address: next
-        })
+        });
       }
     }
   }
@@ -187,12 +189,11 @@ class Web3Provider extends React.Component {
             this.setState({
               networkError: null,
               networkId: netId
-            })
+            });
           }
         }
       });
     }
-
   }
 
   /**
@@ -207,7 +208,10 @@ class Web3Provider extends React.Component {
       const { web3 } = window;
       const isV1 = /^1/.test(web3.version);
       // throws if no account selected
-      const getV1Wallets = () => range(web3.eth.accounts.wallet.length).map(i => web3.eth.accounts.wallet[i]).map(w => w.address);
+      const getV1Wallets = () =>
+        range(web3.eth.accounts.wallet.length)
+          .map(i => web3.eth.accounts.wallet[i])
+          .map(w => w.address);
       const accounts = isV1 ? getV1Wallets() : web3.eth.accounts;
 
       return accounts;
